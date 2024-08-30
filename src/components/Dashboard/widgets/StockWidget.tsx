@@ -14,13 +14,13 @@ export function StockWidget() {
     <Box style={(theme: MantineTheme) => ({
       overflowX: 'auto',
       fontSize: theme.fontSizes.sm,
-      '@media (max-width: 1200px)': {
+      '@media (maxWidth: 1200px)': {
         fontSize: theme.fontSizes.xs,
       },
-      '@media (max-width: 768px)': {
+      '@media (maxWidth: 768px)': {
         fontSize: `${parseFloat(theme.fontSizes.xs) * 0.9}px`,
       },
-      '@media (max-width: 480px)': {
+      '@media (maxWidth: 480px)': {
         fontSize: `${parseFloat(theme.fontSizes.xs) * 0.8}px`,
       },
     })}>

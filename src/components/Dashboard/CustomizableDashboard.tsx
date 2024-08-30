@@ -6,7 +6,6 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import _ from 'lodash';
 
-// Import individual widgets
 import { StockWidget } from './widgets/StockWidget';
 import { CryptoWidget } from './widgets/CryptoWidget';
 import { BondWidget } from './widgets/BondWidget';
@@ -39,10 +38,10 @@ export function CustomizableDashboard() {
   const [mounted, setMounted] = useState(false);
   const [layouts, setLayouts] = useState<{ [key: string]: Widget[] }>({
     lg: [
-      { i: 'widget1', x: 0, y: 0, w: 2, h: 2, type: 'stock' },
-      { i: 'widget2', x: 2, y: 0, w: 2, h: 2, type: 'crypto' },
-      { i: 'widget3', x: 4, y: 0, w: 2, h: 2, type: 'performance' },
-      { i: 'add-widget', x: 0, y: 2, w: 2, h: 2, type: 'add' },
+      { i: 'widget1', x: 0, y: 0, w: 2, h: 3, type: 'stock' },
+      { i: 'widget2', x: 2, y: 0, w: 2, h: 3, type: 'crypto' },
+      { i: 'widget3', x: 4, y: 0, w: 2, h: 3, type: 'performance' },
+      { i: 'add-widget', x: 0, y: 2, w: 2, h: 3, type: 'add' },
     ]
   });
   const [isAddWidgetModalOpen, setIsAddWidgetModalOpen] = useState(false);
@@ -73,10 +72,8 @@ export function CustomizableDashboard() {
       type: 'add'
     };
 
-    // Sort content widgets by their y position, then x position
     contentWidgets.sort((a, b) => a.y - b.y || a.x - b.x);
 
-    // Recalculate positions
     let maxY = 0;
     let currentX = 0;
     const updatedContentWidgets = contentWidgets.map((widget) => {
@@ -89,13 +86,10 @@ export function CustomizableDashboard() {
       return updatedWidget;
     });
 
-    // Position the "Add Widget" placeholder
     if (currentX + addWidget.w <= 6) {
-      // If there's space in the current row, place it there
       addWidget.x = currentX;
       addWidget.y = maxY;
     } else {
-      // If no space in the current row, start a new row
       addWidget.x = 0;
       addWidget.y = maxY + 2;
     }
@@ -110,7 +104,7 @@ export function CustomizableDashboard() {
         i: `widget${Date.now()}`,
         x: 0,
         y: Infinity,
-        w: isFullWidth ? 6 : 2, // Full width (6) or regular width (2)
+        w: isFullWidth ? 6 : 2,
         h: 2,
         type: widgetType,
       };
@@ -142,10 +136,10 @@ export function CustomizableDashboard() {
       const l = sortedLayout[i];
       correctedLayout.push({
         ...l,
-        x: (i * 2) % 6, // Assuming 6 columns
-        y: Math.floor(i / 3) * 2, // 3 items per row
-        w: Math.min(l.w, 6), // Ensure width doesn't exceed 6
-        h: Math.min(l.h, 4), // Limit height to 4 for consistency
+        x: (i * 2) % 6,
+        y: Math.floor(i / 3) * 2,
+        w: Math.min(l.w, 6),
+        h: Math.min(l.h, 4),
       });
     }
 
@@ -158,17 +152,14 @@ export function CustomizableDashboard() {
       return { ...item, type: existingItem?.type || 'unknown' };
     }) as Widget[];
 
-    // Sort the layout by position
     const sortedLayout = _.sortBy(updatedLayout, ['y', 'x']);
 
-    // Assign new positions based on the sorted order
     const swappedLayout = sortedLayout.map((item, index) => ({
       ...item,
-      x: (index * 2) % 6, // Assuming 6 columns
-      y: Math.floor(index / 3) * 2, // 3 items per row
+      x: (index * 2) % 6,
+      y: Math.floor(index / 3) * 2,
     }));
 
-    // Ensure the "add-widget" is always at the end
     const contentWidgets = swappedLayout.filter(w => w.i !== 'add-widget');
     const addWidget = swappedLayout.find(w => w.i === 'add-widget');
 
@@ -194,7 +185,7 @@ export function CustomizableDashboard() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                background: '#f9f9f9', // Very light gray background
+                background: '#f9f9f9', 
               }}
               onClick={onAddWidgetClick}
             >
@@ -216,7 +207,7 @@ export function CustomizableDashboard() {
               className="draggable-handle" 
               style={{ 
                 cursor: 'move', 
-                background: '#f0f0f0', // Light gray background for the title
+                background: '#f0f0f0',
                 padding: '8px 12px', 
                 marginBottom: '12px', 
                 borderRadius: '4px' 

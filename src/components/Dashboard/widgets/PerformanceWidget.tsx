@@ -15,43 +15,43 @@ export const PerformanceWidget: React.FC = () => {
   const theme = useMantineTheme();
 
   return (
-    <Box>
-      <Group grow align="flex-start" wrap="wrap">
-        <Stack gap="xs">
-          <Text size="lg" fw={700} c={theme.primaryColor}>
-            {mockPerformanceData.totalReturn}
-          </Text>
-          <Text size="sm" c="dimmed">Total Return</Text>
-        </Stack>
-        <Stack gap="xs">
-          <Text size="lg" fw={700} c={mockPerformanceData.dailyChange.startsWith('+') ? 'green' : 'red'}>
-            {mockPerformanceData.dailyChange}
-          </Text>
-          <Text size="sm" c="dimmed">Daily Change</Text>
-        </Stack>
-        <Stack gap="xs" style={{ minWidth: '120px' }}>
-          <Text size="lg" fw={700}>{mockPerformanceData.winRate}%</Text>
-          <Text size="sm" c="dimmed">Win Rate</Text>
-          <Progress value={mockPerformanceData.winRate} size="sm" color={theme.primaryColor} />
-        </Stack>
-      </Group>
-      <Group grow align="flex-start" wrap="wrap" mt="md">
-        <Stack gap="xs">
-          <Text size="lg" fw={700}>{mockPerformanceData.profitFactor}</Text>
-          <Text size="sm" c="dimmed">Profit Factor</Text>
-        </Stack>
-        <Stack gap="xs">
-          <Text size="lg" fw={700}>{mockPerformanceData.sharpeRatio}</Text>
-          <Text size="sm" c="dimmed">Sharpe Ratio</Text>
-        </Stack>
-        <Stack gap="xs">
-          <Text size="lg" fw={700} c="green">{mockPerformanceData.bestTrade}</Text>
-          <Text size="sm" c="dimmed">Best Trade</Text>
-        </Stack>
-        <Stack gap="xs">
-          <Text size="lg" fw={700} c="red">{mockPerformanceData.worstTrade}</Text>
-          <Text size="sm" c="dimmed">Worst Trade</Text>
-        </Stack>
+    <Box p="md" style={(theme) => ({
+      border: `1px solid ${theme.colors.gray[3]}`,
+      borderRadius: theme.radius.md,
+    })}>
+      <Group grow align="flex-start" gap="sm">
+        {Object.entries(mockPerformanceData).map(([key, value]) => (
+          <Stack key={key} gap="xs" style={{ minWidth: '100px' }}>
+            <Text size="md" fw={700} style={(theme) => ({
+              color: key === 'totalReturn' ? theme.primaryColor :
+                     key === 'dailyChange' ? ((value as string).startsWith('+') ? 'green' : 'red') :
+                     key === 'bestTrade' ? 'green' :
+                     key === 'worstTrade' ? 'red' : 'inherit',
+              fontSize: theme.fontSizes.md,
+              '@media (max-width: 768px)': {
+                fontSize: theme.fontSizes.sm,
+              },
+            })}>
+              {value}
+            </Text>
+            <Text size="xs" c="dimmed" style={(theme) => ({
+              fontSize: theme.fontSizes.xs,
+              '@media (max-width: 768px)': {
+                fontSize: `${parseFloat(theme.fontSizes.xs) * 0.9}px`,
+              },
+            })}>
+              {key.replace(/([A-Z])/g, ' $1').trim()}
+            </Text>
+            {key === 'winRate' && (
+              <Progress 
+                value={Number(value)} 
+                size="xs" 
+                color={theme.primaryColor} 
+                style={{ marginTop: '4px' }}
+              />
+            )}
+          </Stack>
+        ))}
       </Group>
     </Box>
   );
