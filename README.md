@@ -28,7 +28,31 @@ This project is a scalable and maintainable Next.js application that effectively
 
 ## Getting Started
 
-[Include instructions on how to set up and run the project locally]
+To set up and run the project locally, follow these steps:
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/your-username/st-client-next.git
+   cd st-client-next
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Set up environment variables:
+   - Create a `.env.local` file in the root directory
+   - Add the necessary environment variables (e.g., Firebase config, API keys)
+
+4. Run the development server:
+   ```
+   npm run dev
+   ```
+
+5. Open your browser and navigate to `http://localhost:3000`
+
+Note: Make sure you have Node.js (version 14 or later) and npm installed on your machine.
 
 ## Contributing
 

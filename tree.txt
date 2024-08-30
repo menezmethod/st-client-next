@@ -1,60 +1,50 @@
-README.md  [error opening dir]
-next-env.d.ts  [error opening dir]
-next.config.mjs  [error opening dir]
-package-lock.json  [error opening dir]
-package.json  [error opening dir]
-public
-|-- next.svg
-`-- vercel.svg
-src
-|-- app
-|   |-- favicon.ico
-|   |-- globals.css
-|   |-- layout.tsx
-|   `-- page.module.css
-|-- components
-|   |-- Dashboard
-|   |   |-- CustomizableDashboard.tsx
-|   |   |-- DashboardContent.tsx
-|   |   `-- widgets
-|   |       |-- BondWidget.tsx
-|   |       |-- CryptoWidget.tsx
-|   |       |-- NotesWidget.tsx
-|   |       |-- PerformanceWidget.tsx
-|   |       `-- StockWidget.tsx
-|   |-- GoogleButton.tsx
-|   |-- Layout
-|   |   |-- DashboardLayout.tsx
-|   |   |-- HeaderTabs.module.css
-|   |   |-- HeaderTabs.tsx
-|   |   |-- RightSidebar.module.css
-|   |   |-- RightSidebar.tsx
-|   |   |-- UserButton.module.css
-|   |   `-- UserButton.tsx
-|   `-- WatchList
-|       `-- WatchListContent.tsx
-|-- contexts
-|   `-- AuthContext.tsx
-|-- hooks
-|   `-- useRequireAuth.ts
-|-- lib
-|   |-- api-client.ts
-|   |-- auth.ts
-|   `-- firebase.ts
-|-- pages
-|   |-- _app.tsx
-|   |-- api
-|   |   |-- firebaseAdmin.ts
-|   |   `-- setUserRole.ts
-|   |-- dashboard.tsx
-|   |-- index.tsx
-|   |-- login.tsx
-|   `-- signup.tsx
-|-- providers
-|   `-- AuthProvider.tsx
-|-- services
-|   `-- auth.ts
-`-- theme.ts
-tsconfig.json  [error opening dir]
+app
+|-- favicon.ico
+|-- globals.css
+|-- layout.tsx
+`-- page.module.css
+components
+|-- Dashboard
+|   |-- CustomizableDashboard.tsx
+|   |-- DashboardContent.tsx
+|   `-- widgets
+|       |-- BondWidget.tsx
+|       |-- CryptoWidget.tsx
+|       |-- NotesWidget.tsx
+|       |-- PerformanceWidget.tsx
+|       `-- StockWidget.tsx
+|-- GoogleButton.tsx
+|-- Layout
+|   |-- DashboardLayout.tsx
+|   |-- HeaderTabs.module.css
+|   |-- HeaderTabs.tsx
+|   |-- RightSidebar.module.css
+|   |-- RightSidebar.tsx
+|   |-- UserButton.module.css
+|   `-- UserButton.tsx
+`-- WatchList
+    `-- WatchListContent.tsx
+contexts
+`-- AuthContext.tsx
+hooks
+`-- useRequireAuth.ts
+lib
+|-- api-client.ts
+|-- auth.ts
+`-- firebase.ts
+pages
+|-- _app.tsx
+|-- api
+|   |-- firebaseAdmin.ts
+|   `-- setUserRole.ts
+|-- dashboard.tsx
+|-- index.tsx
+|-- login.tsx
+`-- signup.tsx
+providers
+`-- AuthProvider.tsx
+services
+`-- auth.ts
+theme.ts  [error opening dir]
 
-7028 directories, 58683 files
+13 directories, 35 files
