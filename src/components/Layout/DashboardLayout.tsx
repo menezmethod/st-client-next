@@ -1,8 +1,6 @@
 import React, { ReactNode } from 'react';
 import { AppShell, useMantineTheme, useMantineColorScheme, Box } from '@mantine/core';
 import { HeaderTabs } from './HeaderTabs';
-import { RightSidebar } from './RightSidebar';
-import { DashboardContent } from '../Dashboard/DashboardContent';
 import { LoadingOverlay } from '@mantine/core';
 import { useUser } from '@/lib/auth';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
@@ -42,24 +40,19 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
       styles={{
         main: {
           background: colorScheme === 'dark' ? theme.colors.dark[9] : theme.white,
-          paddingRight: 0,
         },
       }}
       padding="md"
       navbar={{ width: 0, breakpoint: 'sm' }}
     >
       <Box>
-        <HeaderTabs opened={false} toggle={() => {}} />
+        <HeaderTabs />
       </Box>
-      <Box maw={1440} mx="auto" style={{ display: 'flex' }}>
-        <AppShell.Main style={{ flex: 1, maxWidth: 'calc(100% - 300px)' }}>
-          <DashboardContent />
+      <Box maw={1440} mx="auto">
+        <AppShell.Main>
+          {children}
         </AppShell.Main>
-        <Box style={{ width: 300, flexShrink: 0 }}>
-          <RightSidebar />
-        </Box>
       </Box>
-      {children}
     </AppShell>
   );
 }
