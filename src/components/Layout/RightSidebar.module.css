@@ -1,0 +1,25 @@
+.sidebar {
+  padding: var(--mantine-spacing-md);
+  width: 300px;
+}
+
+.floatingSection {
+  background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
+  transition: box-shadow 0.3s ease;
+  box-shadow: var(--mantine-shadow-sm);
+
+  &:hover {
+    box-shadow: var(--mantine-shadow-md);
+  }
+}
+
+.sectionHeader {
+  width: 100%;
+  padding: var(--mantine-spacing-xs) 0;
+  transition: background-color 0.2s ease;
+  border-radius: var(--mantine-radius-sm);
+
+  &:hover {
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-5));
+  }
+}
