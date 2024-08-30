@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import {
   Container,
   Avatar,
@@ -15,14 +14,14 @@ import {
 } from '@mantine/core';
 import {
   IconLogout,
-  IconHeart,
-  IconStar,
   IconMessage,
   IconSettings,
-  IconPlayerPause,
-  IconTrash,
-  IconSwitchHorizontal,
   IconChevronDown,
+  IconWallet,
+  IconPigMoney,
+  IconReportMoney,
+  IconLock,
+  IconHelp,
 } from '@tabler/icons-react';
 import classes from './HeaderTabs.module.css';
 import { auth } from '@/lib/firebase';
@@ -112,24 +111,24 @@ export function HeaderTabs() {
               <Menu.Dropdown>
                 <Menu.Item
                   leftSection={
-                    <IconHeart style={{ width: rem(16), height: rem(16) }} color={theme.colors.red[6]} stroke={1.5} />
+                    <IconWallet style={{ width: rem(16), height: rem(16) }} color={theme.colors.blue[6]} stroke={1.5} />
                   }
                 >
-                  Liked posts
+                  My Portfolios
                 </Menu.Item>
                 <Menu.Item
                   leftSection={
-                    <IconStar style={{ width: rem(16), height: rem(16) }} color={theme.colors.yellow[6]} stroke={1.5} />
+                    <IconPigMoney style={{ width: rem(16), height: rem(16) }} color={theme.colors.green[6]} stroke={1.5} />
                   }
                 >
-                  Saved posts
+                  Savings Goals
                 </Menu.Item>
                 <Menu.Item
                   leftSection={
-                    <IconMessage style={{ width: rem(16), height: rem(16) }} color={theme.colors.blue[6]} stroke={1.5} />
+                    <IconReportMoney style={{ width: rem(16), height: rem(16) }} color={theme.colors.yellow[6]} stroke={1.5} />
                   }
                 >
-                  Your comments
+                  Financial Reports
                 </Menu.Item>
 
                 <Menu.Label>Settings</Menu.Label>
@@ -142,10 +141,10 @@ export function HeaderTabs() {
                 </Menu.Item>
                 <Menu.Item
                   leftSection={
-                    <IconSwitchHorizontal style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+                    <IconLock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
                   }
                 >
-                  Change account
+                  Security settings
                 </Menu.Item>
                 <Menu.Item
                   leftSection={
@@ -158,19 +157,18 @@ export function HeaderTabs() {
 
                 <Menu.Divider />
 
-                <Menu.Label>Danger zone</Menu.Label>
+                <Menu.Label>Support</Menu.Label>
                 <Menu.Item
                   leftSection={
-                    <IconPlayerPause style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+                    <IconHelp style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
                   }
                 >
-                  Pause subscription
+                  Help Center
                 </Menu.Item>
                 <Menu.Item
-                  color="red"
-                  leftSection={<IconTrash style={{ width: rem(16), height: rem(16) }} stroke={1.5} />}
+                  leftSection={<IconMessage style={{ width: rem(16), height: rem(16) }} stroke={1.5} />}
                 >
-                  Delete account
+                  Contact Support
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
