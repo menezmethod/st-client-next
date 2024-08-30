@@ -20,12 +20,21 @@
 - [ ] Implement Firebase authentication
 - [ ] Set up Firestore for local data storage
 
-### 4. API Layer Implementation
+### 4. Plaid Integration
+- [ ] Set up Plaid API keys and secure storage
+- [ ] Integrate Plaid sandbox environment for testing
+- [ ] Implement Plaid Link for account connection
+- [ ] Set up data retrieval for accounts and transactions
+- [ ] Create data models based on Plaid's schema
+- [ ] Implement error handling for Plaid API calls
+
+### 5. API Layer Implementation
 - [x] Create API client using axios in `src/lib/api-client.ts`
 - [ ] Implement auth endpoints using Firebase
 - [ ] Implement journal endpoints
 - [ ] Implement record endpoints
 - [ ] Implement AI analysis endpoints
+- [ ] Create endpoints for Plaid data synchronization
 
 ## User Interface and Core Features
 
