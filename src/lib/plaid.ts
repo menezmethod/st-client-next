@@ -1,4 +1,4 @@
-import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
+import { Configuration, PlaidApi, PlaidEnvironments, AccountBase } from 'plaid';
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments[process.env.NEXT_PUBLIC_PLAID_ENV as keyof typeof PlaidEnvironments || 'sandbox'],
@@ -95,6 +95,16 @@ export async function fetchTransactions(access_token: string) {
     }
   } catch (error) {
     console.error('Error fetching transactions:', error);
+    throw error;
+  }
+}
+
+export async function fetchAccounts(accessToken: string): Promise<AccountBase[]> {
+  try {
+    const response = await plaidClient.accountsGet({ access_token: accessToken });
+    return response.data.accounts;
+  } catch (error) {
+    console.error('Error fetching accounts:', error);
     throw error;
   }
 }
