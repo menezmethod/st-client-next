@@ -1,107 +1,85 @@
 import { useState } from 'react';
-import { Table, Checkbox, Text, Group, Badge, ActionIcon, Menu, Box } from '@mantine/core';
-import { IconDotsVertical, IconEdit, IconTrash, IconCategory } from '@tabler/icons-react';
+import { Table, Checkbox, Text, Badge, Group, Box } from '@mantine/core';
 
 interface Transaction {
-  id: string;
+  transaction_id: string;
   date: string;
-  description: string;
-  category: string;
+  name: string;
   amount: number;
-  type: 'income' | 'expense';
+  category: string[];
+  pending: boolean;
 }
 
-const mockTransactions: Transaction[] = [
-  { id: '1', date: '2023-05-01', description: 'Grocery Shopping at Whole Foods Market', category: 'Food', amount: 120.50, type: 'expense' },
-  { id: '2', date: '2023-05-02', description: 'Monthly Salary Deposit', category: 'Income', amount: 3000, type: 'income' },
-  { id: '3', date: '2023-05-03', description: 'Electric Bill Payment', category: 'Utilities', amount: 85.20, type: 'expense' },
-  { id: '4', date: '2023-05-04', description: 'Freelance Web Development Project Payment', category: 'Income', amount: 500, type: 'income' },
-  { id: '5', date: '2023-05-05', description: 'Dinner at Local Italian Restaurant', category: 'Food', amount: 65.30, type: 'expense' },
-];
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric'
-  });
+interface TransactionsTableProps {
+  transactions: Transaction[];
 }
 
-export function TransactionsTable() {
+export function TransactionsTable({ transactions }: TransactionsTableProps) {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
-  const toggleRow = (id: string) =>
+  if (!transactions || transactions.length === 0) {
+    return <Text>No transactions found.</Text>;
+  }
+
+  const toggleRow = (transaction_id: string) =>
     setSelectedRows((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id]
+      current.includes(transaction_id)
+        ? current.filter((id) => id !== transaction_id)
+        : [...current, transaction_id]
     );
 
   const toggleAll = () =>
-    setSelectedRows((current) => (current.length === mockTransactions.length ? [] : mockTransactions.map((t) => t.id)));
+    setSelectedRows((current) =>
+      current.length === transactions.length ? [] : transactions.map((t) => t.transaction_id)
+    );
 
-  const rows = mockTransactions.map((transaction) => (
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
+  const rows = transactions.map((transaction) => (
     <Table.Tr
-      key={transaction.id}
-      bg={selectedRows.includes(transaction.id) ? 'var(--mantine-color-blue-light)' : undefined}
+      key={transaction.transaction_id}
+      bg={selectedRows.includes(transaction.transaction_id) ? 'var(--mantine-color-blue-light)' : undefined}
     >
       <Table.Td>
         <Checkbox
           aria-label="Select row"
-          checked={selectedRows.includes(transaction.id)}
-          onChange={() => toggleRow(transaction.id)}
+          checked={selectedRows.includes(transaction.transaction_id)}
+          onChange={() => toggleRow(transaction.transaction_id)}
         />
       </Table.Td>
+      <Table.Td>{formatDate(transaction.date)}</Table.Td>
+      <Table.Td>{transaction.name}</Table.Td>
+      <Table.Td>${Math.abs(transaction.amount).toFixed(2)}</Table.Td>
       <Table.Td>
-        <Text size="sm" style={{ whiteSpace: 'nowrap' }}>
-          {formatDate(transaction.date)}
-        </Text>
-      </Table.Td>
-      <Table.Td>
-        <Text size="sm" lineClamp={2}>
-          {transaction.description}
-        </Text>
-      </Table.Td>
-      <Table.Td>
-        <Badge color={transaction.type === 'income' ? 'green' : 'red'}>
-          {transaction.type === 'income' ? '+' : '-'}${Math.abs(transaction.amount).toFixed(2)}
-        </Badge>
-      </Table.Td>
-      <Table.Td>
-        <Text size="sm" lineClamp={1}>
-          {transaction.category}
-        </Text>
-      </Table.Td>
-      <Table.Td>
-        <Group gap="xs" justify="flex-end">
-          <Menu shadow="md" width={200}>
-            <Menu.Target>
-              <ActionIcon variant="subtle" color="gray">
-                <IconDotsVertical style={{ width: '70%', height: '70%' }} stroke={1.5} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item leftSection={<IconEdit size={14} />}>Edit</Menu.Item>
-              <Menu.Item leftSection={<IconCategory size={14} />}>Change Category</Menu.Item>
-              <Menu.Item color="red" leftSection={<IconTrash size={14} />}>Delete</Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
+        <Group gap="xs">
+          {transaction.category.map((cat, index) => (
+            <Badge key={index} color="blue" variant="light">
+              {cat}
+            </Badge>
+          ))}
         </Group>
+      </Table.Td>
+      <Table.Td>
+        <Badge color={transaction.pending ? "yellow" : "green"}>
+          {transaction.pending ? "Pending" : "Posted"}
+        </Badge>
       </Table.Td>
     </Table.Tr>
   ));
 
   return (
-    <Box style={{ overflowX: 'auto' }}>
+    <Box style={{ boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', borderRadius: '8px', overflow: 'hidden' }}>
       <Table>
-        <Table.Thead>
+        <Table.Thead style={{ backgroundColor: '#f8f9fa' }}>
           <Table.Tr>
-            <Table.Th style={{ width: 40 }}>
+            <Table.Th>
               <Checkbox
                 aria-label="Select all"
-                checked={selectedRows.length === mockTransactions.length}
-                indeterminate={selectedRows.length > 0 && selectedRows.length !== mockTransactions.length}
+                checked={selectedRows.length === transactions.length}
+                indeterminate={selectedRows.length > 0 && selectedRows.length !== transactions.length}
                 onChange={toggleAll}
               />
             </Table.Th>
@@ -109,7 +87,7 @@ export function TransactionsTable() {
             <Table.Th>Description</Table.Th>
             <Table.Th>Amount</Table.Th>
             <Table.Th>Category</Table.Th>
-            <Table.Th style={{ width: 40 }} />
+            <Table.Th>Status</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>

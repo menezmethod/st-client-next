@@ -74,8 +74,7 @@ export function HeaderTabs() {
     <Tabs.Tab
       key={tab.value}
       value={tab.value}
-      component={Link}
-      href={tab.href}
+      onClick={() => router.push(tab.href)}
       className={classes.tab}
     >
       {tab.label}

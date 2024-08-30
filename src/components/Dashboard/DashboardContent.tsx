@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Title, Box, Text, Group, Paper, Stack, SegmentedControl } from '@mantine/core';
-import { CustomizableDashboard } from './CustomizableDashboard';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { IconArrowUpRight, IconArrowDownRight } from '@tabler/icons-react';
 
@@ -21,7 +20,8 @@ const generateInitialData = (dataPoints: number, baseValue: number) => {
     currentValue = Math.max(0, currentValue + volatility * trend);
     data.push({
       name: formatTime(i),
-      value: parseFloat(currentValue.toFixed(2))
+      value: parseFloat(currentValue.toFixed(2)),
+      baseline: baseValue
     });
   }
   return data;
@@ -226,7 +226,6 @@ export function DashboardContent() {
           style={{ marginTop: '1rem' }}
         />
       </Paper>
-      <CustomizableDashboard />
     </Box>
   );
 }

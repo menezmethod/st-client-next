@@ -14,13 +14,12 @@ export const plaidClient = new PlaidApi(configuration);
 
 export async function createLinkToken() {
   try {
-    const response = await fetch('/api/create_link_token', {
-      method: 'POST',
-    });
+    const response = await fetch('/api/create_link_token', { method: 'POST' });
     const data = await response.json();
     if (response.ok) {
       return data.link_token;
     } else {
+      console.error('Failed to create link token:', data);
       throw new Error(data.error || 'Failed to create link token');
     }
   } catch (error) {
@@ -33,9 +32,7 @@ export async function exchangePublicToken(public_token: string) {
   try {
     const response = await fetch('/api/exchange_public_token', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ public_token }),
     });
     const data = await response.json();
@@ -80,5 +77,24 @@ export async function removeItem(access_token: string) {
   } catch (error) {
     console.error('Error removing Item:', error);
     return false;
+  }
+}
+
+export async function fetchTransactions(access_token: string) {
+  try {
+    const response = await fetch('/api/fetch_transactions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ access_token }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+      return data.transactions;
+    } else {
+      throw new Error(data.error || 'Failed to fetch transactions');
+    }
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    throw error;
   }
 }
