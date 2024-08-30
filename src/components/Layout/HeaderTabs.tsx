@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
-import Head from 'next/head';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 import {
   Container,
   Avatar,
@@ -14,47 +15,18 @@ import {
 } from '@mantine/core';
 import {
   IconLogout,
+  IconHeart,
+  IconStar,
+  IconMessage,
   IconSettings,
+  IconPlayerPause,
+  IconTrash,
   IconSwitchHorizontal,
   IconChevronDown,
-  IconNotes,
-  IconChartBar,
-  IconRobot,
-  IconEye,
-  IconReportMoney,
 } from '@tabler/icons-react';
 import classes from './HeaderTabs.module.css';
-import { useRouter } from 'next/router';
 import { auth } from '@/lib/firebase';
 import { useUser } from '@/lib/auth';
-
-// Add this function to generate a random color
-const getRandomColor = () => {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-};
-
-// Add this function to get initials
-const getInitials = (name: string) => {
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase();
-};
-
-const tabs = [
-  { value: 'dashboard', label: 'Dashboard', icon: IconChartBar },
-  { value: 'journals', label: 'Journals', icon: IconNotes },
-  { value: 'records', label: 'Records', icon: IconChartBar },
-  { value: 'ai-analysis', label: 'AI Analysis', icon: IconRobot },
-  { value: 'watch-list', label: 'Watch List', icon: IconEye },
-  { value: 'reports', label: 'Reports', icon: IconReportMoney },
-];
 
 const Logo = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 60" width="150" height="30" style={{ filter: 'grayscale(100%) brightness(0.7)' }}>
@@ -71,20 +43,21 @@ const Logo = () => (
   </svg>
 );
 
-export function HeaderTabs({ opened, toggle }: { opened: boolean; toggle: () => void }) {
+const tabs = [
+  { value: 'dashboard', label: 'Dashboard', href: '/' },
+  { value: 'transactions', label: 'Transactions', href: '/transactions' },
+  { value: 'budgets', label: 'Budgets', href: '/budgets' },
+  { value: 'goals', label: 'Goals', href: '/goals' },
+  { value: 'insights', label: 'Insights', href: '/insights' },
+  { value: 'journal', label: 'Journal', href: '/journal' },
+];
+
+export function HeaderTabs() {
   const theme = useMantineTheme();
+  const [opened, setOpened] = useState(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
   const router = useRouter();
   const { data: user, isLoading } = useUser();
-
-  // Generate a random background color for the avatar
-  const avatarColor = useMemo(() => getRandomColor(), []);
-
-  const items = tabs.map((tab) => (
-    <Tabs.Tab value={tab.value} key={tab.value} leftSection={<tab.icon size="0.8rem" />}>
-      {tab.label}
-    </Tabs.Tab>
-  ));
 
   const handleLogout = async () => {
     try {
@@ -95,89 +68,130 @@ export function HeaderTabs({ opened, toggle }: { opened: boolean; toggle: () => 
     }
   };
 
+  const currentTab = tabs.find(tab => tab.href === router.pathname)?.value || 'dashboard';
+
+  const items = tabs.map((tab) => (
+    <Tabs.Tab
+      key={tab.value}
+      value={tab.value}
+      component={Link}
+      href={tab.href}
+      className={classes.tab}
+    >
+      {tab.label}
+    </Tabs.Tab>
+  ));
+
   return (
-    <>
-      <Head>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet" />
-      </Head>
-      <div className={classes.header}>
-        <Container className={classes.mainSection} size="md">
-          <Group justify="space-between">
-            <Logo />
+    <div className={classes.header}>
+      <Container className={classes.mainSection} size="md">
+        <Group justify="space-between">
+          <Logo />
 
-            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+          <Burger opened={opened} onClick={() => setOpened((o) => !o)} hiddenFrom="sm" size="sm" />
 
-            {!isLoading && user && (
-              <Menu
-                width={260}
-                position="bottom-end"
-                transitionProps={{ transition: 'pop-top-right' }}
-                onClose={() => setUserMenuOpened(false)}
-                onOpen={() => setUserMenuOpened(true)}
-                withinPortal
-              >
-                <Menu.Target>
-                  <UnstyledButton className={classes.user}>
-                    <Group gap={7}>
-                      <Avatar 
-                        src={user.photoURL} 
-                        alt={user.displayName || ''} 
-                        radius="xl" 
-                        size={20}
-                        color={avatarColor}
-                      >
-                        {user.displayName ? getInitials(user.displayName) : ''}
-                      </Avatar>
-                      <Text fw={500} size="sm" lh={1} mr={3}>
-                        {user.displayName || user.email}
-                      </Text>
-                      <IconChevronDown style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
-                    </Group>
-                  </UnstyledButton>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Item
-                    leftSection={
-                      <IconSettings style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
-                    }
-                  >
-                    Account settings
-                  </Menu.Item>
-                  <Menu.Item
-                    leftSection={
-                      <IconSwitchHorizontal style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
-                    }
-                  >
-                    Change account
-                  </Menu.Item>
-                  <Menu.Item
-                    leftSection={
-                      <IconLogout style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
-                    }
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            )}
-          </Group>
-        </Container>
-        <Container size="md">
-          <Tabs
-            defaultValue="dashboard"
-            variant="outline"
-            visibleFrom="sm"
-            classNames={{
-              root: classes.tabs,
-              list: classes.tabsList,
-              tab: classes.tab,
-            }}
-          >
-            <Tabs.List>{items}</Tabs.List>
-          </Tabs>
-        </Container>
-      </div>
-    </>
+          {!isLoading && user && (
+            <Menu
+              width={260}
+              position="bottom-end"
+              transitionProps={{ transition: 'pop-top-right' }}
+              onClose={() => setUserMenuOpened(false)}
+              onOpen={() => setUserMenuOpened(true)}
+              withinPortal
+            >
+              <Menu.Target>
+                <UnstyledButton className={classes.user}>
+                  <Group gap={7}>
+                    <Avatar src={user.photoURL} alt={user.displayName || ''} radius="xl" size={20} />
+                    <Text fw={500} size="sm" lh={1} mr={3}>
+                      {user.displayName || user.email}
+                    </Text>
+                    <IconChevronDown style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
+                  </Group>
+                </UnstyledButton>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={
+                    <IconHeart style={{ width: rem(16), height: rem(16) }} color={theme.colors.red[6]} stroke={1.5} />
+                  }
+                >
+                  Liked posts
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={
+                    <IconStar style={{ width: rem(16), height: rem(16) }} color={theme.colors.yellow[6]} stroke={1.5} />
+                  }
+                >
+                  Saved posts
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={
+                    <IconMessage style={{ width: rem(16), height: rem(16) }} color={theme.colors.blue[6]} stroke={1.5} />
+                  }
+                >
+                  Your comments
+                </Menu.Item>
+
+                <Menu.Label>Settings</Menu.Label>
+                <Menu.Item
+                  leftSection={
+                    <IconSettings style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+                  }
+                >
+                  Account settings
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={
+                    <IconSwitchHorizontal style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+                  }
+                >
+                  Change account
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={
+                    <IconLogout style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+                  }
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Menu.Item>
+
+                <Menu.Divider />
+
+                <Menu.Label>Danger zone</Menu.Label>
+                <Menu.Item
+                  leftSection={
+                    <IconPlayerPause style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+                  }
+                >
+                  Pause subscription
+                </Menu.Item>
+                <Menu.Item
+                  color="red"
+                  leftSection={<IconTrash style={{ width: rem(16), height: rem(16) }} stroke={1.5} />}
+                >
+                  Delete account
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          )}
+        </Group>
+      </Container>
+      <Container size="md">
+        <Tabs
+          value={currentTab}
+          onChange={(value) => router.push(tabs.find(tab => tab.value === value)?.href || '/')}
+          variant="outline"
+          classNames={{
+            root: classes.tabs,
+            list: classes.tabsList,
+            tab: classes.tab,
+          }}
+        >
+          <Tabs.List>{items}</Tabs.List>
+        </Tabs>
+      </Container>
+    </div>
   );
 }
