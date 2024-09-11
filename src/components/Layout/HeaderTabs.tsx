@@ -44,11 +44,14 @@ const Logo = () => (
 
 const tabs = [
   { value: 'dashboard', label: 'Dashboard', href: '/' },
+  { value: 'accounts', label: 'Accounts', href: '/accounts' },
   { value: 'transactions', label: 'Transactions', href: '/transactions' },
-  { value: 'budgets', label: 'Budgets', href: '/budgets' },
+  { value: 'reports', label: 'Reports', href: '/reports' },
+  { value: 'budget', label: 'Budget', href: '/budget' },
+  { value: 'recurring', label: 'Recurring', href: '/recurring' },
   { value: 'goals', label: 'Goals', href: '/goals' },
-  { value: 'insights', label: 'Insights', href: '/insights' },
-  { value: 'journal', label: 'Journal', href: '/journal' },
+  { value: 'investments', label: 'Investments', href: '/investments' },
+  { value: 'advice', label: 'Advice', href: '/advice' },
 ];
 
 export function HeaderTabs() {

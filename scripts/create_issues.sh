@@ -33,7 +33,7 @@ if [ -z "$repo" ]; then
     exit 1
 fi
 
-echo "Creating issues in repository: $repo"
+echo "Processing issues in repository: $repo"
 
 # Create labels
 echo "Creating labels..."
@@ -50,7 +50,10 @@ for label in $labels; do
     fi
 done
 
-# Loop through each issue and create it in GitHub
+# Get existing issues
+existing_issues=$(gh issue list --repo "$repo" --json number,title --jq '.[]')
+
+# Loop through each issue in the YAML file
 for row in $(yq e '.issues | keys | .[]' $yaml_file); do
   title=$(yq e ".issues[$row].title" $yaml_file)
   body=$(yq e ".issues[$row].body" $yaml_file)
@@ -60,8 +63,28 @@ for row in $(yq e '.issues | keys | .[]' $yaml_file); do
   echo "Processing issue: $title"
   
   # Check if the issue already exists
-  if gh issue list --repo "$repo" --json title --jq ".[] | select(.title == \"$title\") | .title" | grep -q "$title"; then
+  existing_issue=$(echo "$existing_issues" | jq -r "select(.title == \"$title\")")
+  if [ ! -z "$existing_issue" ]; then
     echo "Issue already exists: $title"
+    issue_number=$(echo "$existing_issue" | jq -r '.number')
+    
+    # Update the existing issue
+    label_args=""
+    for label in $labels; do
+      label_args="$label_args --add-label \"$label\""
+    done
+    
+    assignee_args=""
+    for assignee in $assignees; do
+      assignee_args="$assignee_args --add-assignee $assignee"
+    done
+    
+    if output=$(gh issue edit $issue_number --repo "$repo" --title "$title" --body "$body" $label_args $assignee_args 2>&1); then
+      echo "Successfully updated issue: $title"
+    else
+      echo "Error updating issue: $title"
+      echo "Error message: $output"
+    fi
   else
     # Create the issue in GitHub
     label_args=""
@@ -80,6 +103,21 @@ for row in $(yq e '.issues | keys | .[]' $yaml_file); do
     else
       echo "Error creating issue: $title"
       echo "Error message: $output"
+    fi
+  fi
+done
+
+# Delete issues that are not in the YAML file
+echo "Checking for issues to delete..."
+for issue in $(echo "$existing_issues" | jq -c '.'); do
+  existing_title=$(echo $issue | jq -r '.title')
+  if ! yq e '.issues[].title' $yaml_file | grep -q "$existing_title"; then
+    echo "Deleting issue: $existing_title"
+    issue_number=$(echo $issue | jq -r '.number')
+    if gh issue close $issue_number --repo "$repo" --comment "Closing issue as it's no longer needed."; then
+      echo "Successfully closed issue: $existing_title"
+    else
+      echo "Error closing issue: $existing_title"
     fi
   fi
 done
