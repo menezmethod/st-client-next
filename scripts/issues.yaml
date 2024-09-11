@@ -1,126 +1,185 @@
 issues:
-  - title: Project Setup
+  - title: Implement basic authentication flow
     body: |
-      Set up the Next.js project with TypeScript, ESLint, Prettier, and Husky for pre-commit hooks. Create and push a develop branch on GitHub.
-    labels: ['setup', 'priority-high']
+      - Set up Firebase authentication
+      - Create login and registration pages
+      - Implement email/password authentication
+      - Add social login options (Google, Facebook)
+      - Implement biometric authentication for mobile devices
+    labels: ['auth', 'priority-high']
     assignees: ['menezmethod']
 
-  - title: Install Core Dependencies
+  - title: Develop onboarding wizard
     body: |
-      Install Mantine UI, axios, @tanstack/react-query, and zod. Set up axios for API client.
-    labels: ['dependencies', 'priority-high']
+      - Create multi-step onboarding process
+      - Implement financial goal assessment questionnaire
+      - Design and implement UI for onboarding wizard
+      - Store user preferences and goals
+    labels: ['onboarding', 'priority-high']
     assignees: ['menezmethod']
 
-  - title: Implement Firebase Integration
+  - title: Integrate Plaid API for financial institution connections
     body: |
-      Set up Firebase in the project, implement Firebase authentication, and set up Firestore for local data storage.
-    labels: ['feature', 'authentication', 'priority-high']
+      - Set up Plaid API keys and secure storage
+      - Implement Plaid Link for account connection
+      - Set up data retrieval for accounts and transactions
+      - Handle Plaid webhook events
+    labels: ['api', 'priority-high']
     assignees: ['menezmethod']
 
-  - title: Integrate Plaid API
+  - title: Implement multi-API support for financial connections
     body: |
-      Set up Plaid API keys, integrate Plaid sandbox environment, implement Plaid Link, and set up data retrieval for accounts and transactions. Create data models based on Plaid's schema and implement error handling for Plaid API calls.
-    labels: ['feature', 'api', 'priority-medium']
+      - Integrate MX API
+      - Add Yodlee API support
+      - Create unified interface for multi-API support
+      - Implement error handling and connection status monitoring
+    labels: ['api', 'priority-medium']
     assignees: ['menezmethod']
 
-  - title: Implement API Layer
+  - title: Develop account aggregation and categorization
     body: |
-      Create API client using axios in `src/lib/api-client.ts`. Implement authentication, journal, record, AI analysis, and Plaid data synchronization endpoints.
-    labels: ['api', 'backend', 'priority-high']
+      - Implement automated account categorization system
+      - Create manual category overrides and custom categories
+      - Develop account balance history tracking
+      - Implement account linking and unlinking functionality
+    labels: ['feature', 'priority-high']
     assignees: ['menezmethod']
 
-  - title: Setup Basic UI Components
+  - title: Create basic dashboard layout
     body: |
-      Set up Mantine theming, create layout components (Header, Footer, Sidebar), and implement responsive design for all screen sizes.
+      - Design and implement responsive dashboard layout
+      - Create reusable widget components
+      - Implement drag-and-drop functionality for widget customization
     labels: ['ui', 'priority-high']
     assignees: ['menezmethod']
 
-  - title: Develop Authentication UI
+  - title: Implement net worth tracker
     body: |
-      Create login, registration, and password reset pages using Firebase authentication.
-    labels: ['ui', 'authentication', 'priority-high']
+      - Create net worth calculation logic
+      - Implement real-time updates for net worth
+      - Design and create historical net worth chart
+    labels: ['feature', 'priority-high']
     assignees: ['menezmethod']
 
-  - title: Implement Journal Management
+  - title: Develop cash flow visualizer
     body: |
-      Create journal list, detail, and creation pages. Implement journal editing and deletion.
-    labels: ['feature', 'journal', 'priority-medium']
+      - Implement cash flow calculation logic
+      - Create dynamic cash flow chart component
+      - Add income and expense breakdown
+    labels: ['feature', 'priority-high']
     assignees: ['menezmethod']
 
-  - title: Implement Record Management
+  - title: Create AI-driven financial health score
     body: |
-      Create record list, detail, and creation pages. Implement record editing and deletion.
-    labels: ['feature', 'record', 'priority-medium']
+      - Develop algorithm for financial health scoring
+      - Implement real-time score updates
+      - Generate actionable insights based on financial health score
+    labels: ['feature', 'ai', 'priority-medium']
     assignees: ['menezmethod']
 
-  - title: Develop AI Analysis Features
+  - title: Implement transaction management system
     body: |
-      Implement financial analysis UI, create stock quote retrieval interface, and develop historical stock data visualization.
-    labels: ['feature', 'AI', 'priority-low']
+      - Set up transaction data retrieval from financial APIs
+      - Implement real-time transaction alerts
+      - Create transaction search functionality with natural language support
+      - Develop basic fraud detection system
+    labels: ['feature', 'priority-high']
     assignees: ['menezmethod']
 
-  - title: Optimize State Management and Data Fetching
+  - title: Develop machine learning for transaction categorization
     body: |
-      Set up react-query for server state management, implement global stores if needed, and create feature-specific stores.
-    labels: ['state-management', 'optimization', 'priority-medium']
+      - Implement initial ML model for transaction categorization
+      - Create feedback loop for improving categorization accuracy
+      - Develop system for handling edge cases and user corrections
+    labels: ['feature', 'ai', 'priority-medium']
     assignees: ['menezmethod']
 
-  - title: Implement Error Handling and Notifications
+  - title: Implement receipt capture and storage
     body: |
-      Implement API error interceptor, set up error boundaries, and create error toast notifications using Mantine.
-    labels: ['error-handling', 'priority-medium']
+      - Create UI for one-click receipt capture
+      - Implement receipt image processing and OCR
+      - Develop secure storage system for receipts
+    labels: ['feature', 'priority-medium']
     assignees: ['menezmethod']
 
-  - title: Optimize Performance
+  - title: Develop budgeting system
     body: |
-      Implement code splitting at the route level, optimize Firebase queries and listeners, and use React.memo, useMemo, and useCallback where appropriate.
-    labels: ['performance', 'priority-low']
+      - Create budget creation and management interface
+      - Implement real-time budget tracking
+      - Develop predictive alerts for budget overruns
+    labels: ['feature', 'priority-high']
     assignees: ['menezmethod']
 
-  - title: Implement Testing
+  - title: Implement AI-generated budget suggestions
     body: |
-      Write unit tests for utility functions, create integration tests for main features, and implement MSW for API mocking during tests.
+      - Develop AI model for analyzing spending patterns
+      - Create system for generating personalized budget suggestions
+      - Implement UI for presenting and applying AI suggestions
+    labels: ['feature', 'ai', 'priority-medium']
+    assignees: ['menezmethod']
+
+  - title: Create expense analysis tools
+    body: |
+      - Develop visual breakdown of expenses
+      - Implement trend analysis for spending patterns
+      - Create "Safe to spend" daily allowance calculator
+    labels: ['feature', 'priority-medium']
+    assignees: ['menezmethod']
+
+  - title: Implement savings goals system
+    body: |
+      - Create UI for setting and managing multiple savings goals
+      - Implement visual progress trackers for goals
+      - Develop automated savings rules (round-ups, percentage of income)
+    labels: ['feature', 'priority-high']
+    assignees: ['menezmethod']
+
+  - title: Develop basic investment tracking
+    body: |
+      - Create portfolio overview with real-time updates
+      - Implement basic performance metrics calculation
+      - Develop dividend tracking and reinvestment monitoring
+      - Create simple stock watchlist with price alerts
+    labels: ['feature', 'priority-medium']
+    assignees: ['menezmethod']
+
+  - title: Implement bill management system
+    body: |
+      - Develop bill detection and reminder system
+      - Create payment scheduling and automation features
+      - Implement subscription tracking and optimization suggestions
+    labels: ['feature', 'priority-medium']
+    assignees: ['menezmethod']
+
+  - title: Integrate credit score monitoring
+    body: |
+      - Set up integration with credit score provider
+      - Implement credit score display and history tracking
+      - Create credit score simulator for "what-if" scenarios
+      - Develop personalized credit improvement tips
+    labels: ['feature', 'priority-medium']
+    assignees: ['menezmethod']
+
+  - title: Implement error handling and logging
+    body: |
+      - Set up global error boundary
+      - Implement error logging and reporting system
+      - Create user-friendly error messages and recovery flows
+    labels: ['dev', 'priority-high']
+    assignees: ['menezmethod']
+
+  - title: Set up testing framework
+    body: |
+      - Configure Jest and React Testing Library
+      - Set up API mocking with MSW
+      - Create initial set of unit and integration tests
     labels: ['testing', 'priority-high']
     assignees: ['menezmethod']
 
-  - title: Develop Advanced UI Features
+  - title: Prepare for deployment
     body: |
-      Implement infinite scrolling or pagination, create a dashboard with customizable widgets, and develop data visualization components.
-    labels: ['ui', 'feature', 'priority-low']
-    assignees: ['menezmethod']
-
-  - title: Implement SEO and Metadata
-    body: |
-      Implement SEO practices using Next.js Head component and create dynamic metadata for journal and record pages.
-    labels: ['seo', 'priority-low']
-    assignees: ['menezmethod']
-
-  - title: Ensure Code Quality and Documentation
-    body: |
-      Conduct final ESLint and Prettier pass, review and update documentation, and create README.md with project setup instructions.
-    labels: ['documentation', 'priority-medium']
-    assignees: ['menezmethod']
-
-  - title: Set Up Environment Variables
-    body: |
-      Create `.env.local`, `.env.dev`, and configure `next.config.js` for environment variable management.
-    labels: ['setup', 'priority-medium']
-    assignees: ['menezmethod']
-
-  - title: Prepare for Deployment
-    body: |
-      Set up CI/CD pipeline, configure production build settings, and prepare deployment documentation.
+      - Set up CI/CD pipeline
+      - Configure production build settings
+      - Prepare deployment documentation
     labels: ['deployment', 'priority-high']
-    assignees: ['menezmethod']
-
-  - title: Conduct Final Testing and Review
-    body: |
-      Perform end-to-end testing, cross-browser compatibility checks, and review accessibility compliance.
-    labels: ['testing', 'review', 'priority-high']
-    assignees: ['menezmethod']
-
-  - title: Launch and Monitor Application
-    body: |
-      Deploy to production, set up application monitoring and logging, and establish a user feedback collection process.
-    labels: ['deployment', 'monitoring', 'priority-high']
     assignees: ['menezmethod']
