@@ -1,3 +1,4 @@
+import React from 'react';
 import { AppProps } from 'next/app';
 import { Loader, MantineProvider, Center } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -7,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import '@mantine/core/styles.css'; 
-import { theme } from '@/theme';
+import { theme } from '../theme'; 
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     return () => unsubscribe();
   }, [router]);
+
   if (!isAuthReady) {
     return (
       <MantineProvider theme={theme}>
@@ -45,7 +47,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
+      <MantineProvider theme={theme}>
         <Component {...pageProps} />
       </MantineProvider>
       <ReactQueryDevtools initialIsOpen={false} />
