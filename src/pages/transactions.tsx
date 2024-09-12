@@ -1,6 +1,6 @@
 import React from 'react';
 import { DashboardLayout } from '../components/Layout/DashboardLayout';
-import { Stack, Group, Button, Text, Loader, Alert } from '@mantine/core';
+import { Stack, Group, Button, Text, Loader, Alert, Skeleton } from '@mantine/core';
 import { fetchTransactions } from '../lib/plaid';
 import { usePlaidLink } from '../hooks/usePlaidLink';
 import { TransactionsTable } from '../components/Transactions/TransactionsTable';
@@ -27,8 +27,6 @@ export default function TransactionsPage() {
     queryKey: ['transactions', accessToken],
     queryFn: () => fetchTransactions(accessToken!),
     enabled: !!accessToken,
-    onSuccess: (data) => console.log('Transactions fetched:', data),
-    onError: (error) => console.error('Error fetching transactions:', error),
   });
 
   const isLoading = isLinkLoading || isAccessTokenLoading || isTransactionsLoading;
@@ -47,7 +45,7 @@ export default function TransactionsPage() {
         </Group>
         
         {isLoading ? (
-          <Loader />
+          <Skeleton height={200} />
         ) : accessToken ? (
           transactions && transactions.length > 0 ? (
             <TransactionsTable transactions={transactions.map(t => ({

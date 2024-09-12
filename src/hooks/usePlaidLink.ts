@@ -1,16 +1,15 @@
-import { useState, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { usePlaidLink as usePlaidLinkOriginal } from 'react-plaid-link';
+import { usePlaidLink as usePlaidLinkOriginal, PlaidLinkOptionsWithLinkToken } from 'react-plaid-link';
 import { createLinkToken, exchangePublicToken } from '../lib/plaid';
 
 export function usePlaidLink() {
-  const [linkToken, setLinkToken] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  const { refetch: refetchLinkToken } = useQuery({
+  const { data: linkToken, refetch: refetchLinkToken } = useQuery({
     queryKey: ['linkToken'],
     queryFn: createLinkToken,
-    enabled: false,
+    staleTime: 1000 * 60 * 4, // 4 minutes
   });
 
   const exchangeTokenMutation = useMutation({
@@ -34,28 +33,30 @@ export function usePlaidLink() {
     console.log('Link exit', err, metadata);
   }, []);
 
-  const config = {
-    token: linkToken,
+  const config: PlaidLinkOptionsWithLinkToken = {
+    token: linkToken ?? null,
     onSuccess,
     onExit,
   };
 
   const { open, ready } = usePlaidLinkOriginal(config);
 
-  const initiatePlaidLink = useCallback(async () => {
+  useEffect(() => {
     if (!linkToken) {
-      const result = await refetchLinkToken();
-      if (result.isSuccess && result.data) {
-        setLinkToken(result.data);
-      }
+      refetchLinkToken();
     }
+  }, [linkToken, refetchLinkToken]);
+
+  const initiatePlaidLink = useCallback(() => {
     if (ready && linkToken) {
       open();
+    } else {
+      console.log('Plaid Link not ready or link token not available');
     }
-  }, [linkToken, ready, open, refetchLinkToken]);
+  }, [ready, linkToken, open]);
 
   return {
     initiatePlaidLink,
-    isLoading: exchangeTokenMutation.isPending,
+    isLoading: exchangeTokenMutation.isPending || !linkToken,
   };
 }

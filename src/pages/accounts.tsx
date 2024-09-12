@@ -1,8 +1,8 @@
 import React from 'react';
 import { DashboardLayout } from '../components/Layout/DashboardLayout';
-import { Stack, Group, Button, Text, Loader, Alert } from '@mantine/core';
+import { Stack, Group, Button, Text, Loader, Alert, Skeleton } from '@mantine/core';
 import { Accounts } from '../features/accounts/components/Accounts';
-import { IconAlertCircle } from '@tabler/icons-react';
+import { IconAlertCircle, IconInfoCircle } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { Account } from '../types/account';
 import { useErrorMessage } from '../hooks/useErrorMessage';
@@ -45,11 +45,13 @@ export default function AccountsPage() {
         </Group>
         
         {isLoading ? (
-          <Loader />
+          <Skeleton height={200} />
         ) : accessToken ? (
           accounts && accounts.length > 0 ? <Accounts accounts={accounts} /> : <Text>No accounts found.</Text>
         ) : (
-          <Text>Connect a bank account to view your accounts.</Text>
+          <Alert variant="light" color="red" title="No Bank Account Connected" icon={<IconInfoCircle />}>
+            Connect a bank account to view your accounts.
+          </Alert>
         )}
         
         <Group justify="flex-end">
