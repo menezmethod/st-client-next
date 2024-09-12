@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DashboardLayout } from '../components/Layout/DashboardLayout';
-import { Stack, Group, Button, Text, Loader, Alert } from '@mantine/core';
+import { Stack, Group, Button, Text, Loader, Alert, Skeleton } from '@mantine/core';
 import { InvestmentsTable } from '../features/investments/components/InvestmentsTable';
 import { usePlaidLink } from '../hooks/usePlaidLink';
 import { fetchInvestments } from '../lib/plaid';
-import { IconAlertCircle } from '@tabler/icons-react';
+import { IconAlertCircle, IconInfoCircle } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useErrorMessage } from '../hooks/useErrorMessage';
 import { Investment, Security, Account } from '../types/investment';
@@ -28,7 +28,8 @@ export default function InvestmentsPage() {
   const { 
     data: investmentsData, 
     isLoading: isInvestmentsLoading, 
-    error: investmentsError 
+    error: investmentsError,
+    refetch: refetchInvestments
   } = useQuery<InvestmentsData>({
     queryKey: ['investments', accessToken],
     queryFn: () => fetchInvestments(accessToken!),
@@ -37,6 +38,16 @@ export default function InvestmentsPage() {
 
   const isLoading = isLinkLoading || isAccessTokenLoading || isInvestmentsLoading;
   const errorMessage = useErrorMessage(investmentsError);
+
+  useEffect(() => {
+    if (accessToken) {
+      refetchInvestments();
+    }
+  }, [accessToken, refetchInvestments]);
+
+  const handleConnectAccount = () => {
+    initiatePlaidLink();
+  };
 
   return (
     <DashboardLayout>
@@ -51,7 +62,7 @@ export default function InvestmentsPage() {
         </Group>
         
         {isLoading ? (
-          <Loader />
+          <Skeleton height={200} />
         ) : accessToken ? (
           investmentsData ? (
             <InvestmentsTable 
@@ -63,12 +74,14 @@ export default function InvestmentsPage() {
             <Text>No investment data available.</Text>
           )
         ) : (
-          <Text>Connect an investment account to view your investments.</Text>
+          <Alert variant="light" color="red" title="No Investment Account Connected" icon={<IconInfoCircle />}>
+            Connect an investment account to view your investments.
+          </Alert>
         )}
 
         <Group justify="flex-end">
           <Button 
-            onClick={initiatePlaidLink}
+            onClick={handleConnectAccount}
             disabled={isLoading}
             loading={isLoading}
           >

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Table, Text, Badge, Box } from '@mantine/core';
-import { Investment } from '../../../types/investment';
+import { Investment, Security, Account } from '../../../types/investment';
 
 interface InvestmentsTableProps {
   holdings: Investment[];
-  securities: any[];
-  accounts: any[];
+  securities: Security[];
+  accounts: Account[];
 }
 
 export function InvestmentsTable({ holdings, securities, accounts }: InvestmentsTableProps) {
