@@ -1,29 +1,17 @@
-import React, { useState } from 'react';
-import { Table, Text, Badge, Group, Box, Checkbox } from '@mantine/core';
-import { Investment } from '@/types/investment';
+import React from 'react';
+import { Table, Text, Badge, Box } from '@mantine/core';
+import { Investment } from '../../../types/investment';
 
 interface InvestmentsTableProps {
-  investments: Investment[];
+  holdings: Investment[];
+  securities: any[];
+  accounts: any[];
 }
 
-export function InvestmentsTable({ investments }: InvestmentsTableProps) {
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
-
-  if (!investments || investments.length === 0) {
+export function InvestmentsTable({ holdings, securities, accounts }: InvestmentsTableProps) {
+  if (!holdings || holdings.length === 0) {
     return <Text>No investments found.</Text>;
   }
-
-  const toggleRow = (id: string) =>
-    setSelectedRows((current) =>
-      current.includes(id)
-        ? current.filter((rowId) => rowId !== id)
-        : [...current, id]
-    );
-
-  const toggleAll = () =>
-    setSelectedRows((current) =>
-      current.length === investments.length ? [] : investments.map((i) => i.id)
-    );
 
   const getColor = (type: string) => {
     switch (type.toLowerCase()) {
@@ -36,41 +24,33 @@ export function InvestmentsTable({ investments }: InvestmentsTableProps) {
     }
   };
 
-  const formatCurrency = (amount: number | null | undefined) => {
-    return amount != null ? `$${amount.toFixed(2)}` : 'N/A';
+  const formatCurrency = (amount: number) => {
+    return `$${amount.toFixed(2)}`;
   };
 
-  const calculatePerformance = (holdings: Investment['holdings']) => {
-    const costBasis = holdings.cost_basis * holdings.quantity;
-    const currentValue = holdings.institution_value;
+  const calculatePerformance = (holding: Investment) => {
+    const costBasis = holding.cost_basis * holding.quantity;
+    const currentValue = holding.institution_value;
     return ((currentValue - costBasis) / costBasis) * 100;
   };
 
-  const rows = investments.map((investment) => {
-    const performance = calculatePerformance(investment.holdings);
+  const rows = holdings.map((holding) => {
+    const security = securities.find(s => s.security_id === holding.security_id);
+    const account = accounts.find(a => a.account_id === holding.account_id);
+    const performance = calculatePerformance(holding);
     return (
-      <Table.Tr
-        key={investment.id}
-        bg={selectedRows.includes(investment.id) ? 'var(--mantine-color-blue-light)' : undefined}
-      >
+      <Table.Tr key={holding.security_id}>
+        <Table.Td>{security?.name || 'Unknown'}</Table.Td>
         <Table.Td>
-          <Checkbox
-            aria-label="Select row"
-            checked={selectedRows.includes(investment.id)}
-            onChange={() => toggleRow(investment.id)}
-          />
+          <Badge color={getColor(security?.type || 'unknown')}>{security?.type || 'Unknown'}</Badge>
         </Table.Td>
-        <Table.Td>{investment.name}</Table.Td>
-        <Table.Td>
-          <Badge color={getColor(investment.type)}>{investment.type}</Badge>
-        </Table.Td>
-        <Table.Td>{investment.holdings.quantity}</Table.Td>
-        <Table.Td>{formatCurrency(investment.holdings.institution_price)}</Table.Td>
-        <Table.Td>{formatCurrency(investment.value)}</Table.Td>
-        <Table.Td>{formatCurrency(investment.holdings.cost_basis * investment.holdings.quantity)}</Table.Td>
+        <Table.Td>{holding.quantity}</Table.Td>
+        <Table.Td>{formatCurrency(holding.institution_price)}</Table.Td>
+        <Table.Td>{formatCurrency(holding.institution_value)}</Table.Td>
+        <Table.Td>{formatCurrency(holding.cost_basis * holding.quantity)}</Table.Td>
         <Table.Td>
           <Text c={performance >= 0 ? 'green' : 'red'} fw={700}>
-            {isNaN(performance) ? '-' : `${performance.toFixed(2)}%`}
+            {performance.toFixed(2)}%
           </Text>
         </Table.Td>
       </Table.Tr>
@@ -78,18 +58,10 @@ export function InvestmentsTable({ investments }: InvestmentsTableProps) {
   });
 
   return (
-    <Box style={{ boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', borderRadius: '8px', overflow: 'hidden' }}>
-      <Table>
-        <Table.Thead style={{ backgroundColor: '#f8f9fa' }}>
+    <Box style={{ boxShadow: 'var(--mantine-shadow-sm)', borderRadius: 'var(--mantine-radius-md)', border: '1px solid var(--mantine-color-gray-3)' }}>
+      <Table striped highlightOnHover>
+        <Table.Thead>
           <Table.Tr>
-            <Table.Th>
-              <Checkbox
-                aria-label="Select all"
-                checked={selectedRows.length === investments.length}
-                indeterminate={selectedRows.length > 0 && selectedRows.length !== investments.length}
-                onChange={toggleAll}
-              />
-            </Table.Th>
             <Table.Th>Name</Table.Th>
             <Table.Th>Type</Table.Th>
             <Table.Th>Quantity</Table.Th>

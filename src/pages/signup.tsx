@@ -4,6 +4,7 @@ import { TextInput, PasswordInput, Button, Box, Title, Text, Divider, Paper, Con
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { GoogleButton } from '../components/GoogleButton';
+import React from 'react';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');

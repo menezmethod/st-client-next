@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Table, Checkbox, Text, Badge, Group, Box } from '@mantine/core';
 
 interface Transaction {
@@ -71,9 +71,9 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
   ));
 
   return (
-    <Box style={{ boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', borderRadius: '8px', overflow: 'hidden' }}>
-      <Table>
-        <Table.Thead style={{ backgroundColor: '#f8f9fa' }}>
+    <Box style={{ boxShadow: 'var(--mantine-shadow-sm)', borderRadius: 'var(--mantine-radius-md)', border: '1px solid var(--mantine-color-gray-3)' }}>
+      <Table striped highlightOnHover>
+        <Table.Thead>
           <Table.Tr>
             <Table.Th>
               <Checkbox

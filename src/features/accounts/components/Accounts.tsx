@@ -1,7 +1,7 @@
 import React from 'react';
 import { SimpleGrid, Card, Text, Badge, Group, Stack } from '@mantine/core';
 import { IconCreditCard, IconPigMoney, IconBuildingBank } from '@tabler/icons-react';
-import { Account } from '@/types/account';
+import { Account } from '../../../types/account';
 
 interface AccountsProps {
   accounts: Account[];
@@ -44,7 +44,7 @@ export function Accounts({ accounts }: AccountsProps) {
       spacing="lg"
     >
       {accounts.map((account) => (
-        <Card key={account.id} shadow="sm" padding="lg" radius="md" withBorder>
+        <Card key={account.account_id} shadow="sm" padding="lg" radius="md" withBorder>
           <Card.Section withBorder inheritPadding py="xs">
             <Group justify="space-between">
               <Text fw={500}>{account.name}</Text>
@@ -68,7 +68,7 @@ export function Accounts({ accounts }: AccountsProps) {
             </Text>
           </Stack>
 
-          {account.balances.available !== undefined && (
+          {account.balances.available !== null && (
             <Stack mt="xs">
               <Text size="sm">
                 {formatCurrency(account.balances.available)} available
@@ -76,7 +76,7 @@ export function Accounts({ accounts }: AccountsProps) {
             </Stack>
           )}
 
-          {account.balances.limit !== null && account.balances.limit !== undefined && (
+          {account.balances.limit !== null && (
             <Stack mt="xs">
               <Text size="sm">
                 {formatCurrency(account.balances.limit)} limit
