@@ -1,36 +1,28 @@
 import React, { useState } from 'react';
 import { Table, Checkbox, Text, Badge, Group, Box } from '@mantine/core';
-
-interface Transaction {
-  transaction_id: string;
-  date: string;
-  name: string;
-  amount: number;
-  category: string[];
-  pending: boolean;
-}
+import { Transaction } from '@/types/transaction';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
 }
 
 export function TransactionsTable({ transactions }: TransactionsTableProps) {
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   if (!transactions || transactions.length === 0) {
     return <Text>No transactions found.</Text>;
   }
 
-  const toggleRow = (transaction_id: string) =>
+  const toggleRow = (id: number) =>
     setSelectedRows((current) =>
-      current.includes(transaction_id)
-        ? current.filter((id) => id !== transaction_id)
-        : [...current, transaction_id]
+      current.includes(id)
+        ? current.filter((rowId) => rowId !== id)
+        : [...current, id]
     );
 
   const toggleAll = () =>
     setSelectedRows((current) =>
-      current.length === transactions.length ? [] : transactions.map((t) => t.transaction_id)
+      current.length === transactions.length ? [] : transactions.map((t) => t.id)
     );
 
   const formatDate = (dateString: string) => {
@@ -38,21 +30,25 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(amount));
+  };
+
   const rows = transactions.map((transaction) => (
     <Table.Tr
-      key={transaction.transaction_id}
-      bg={selectedRows.includes(transaction.transaction_id) ? 'var(--mantine-color-blue-light)' : undefined}
+      key={transaction.id}
+      bg={selectedRows.includes(transaction.id) ? 'var(--mantine-color-blue-light)' : undefined}
     >
       <Table.Td>
         <Checkbox
           aria-label="Select row"
-          checked={selectedRows.includes(transaction.transaction_id)}
-          onChange={() => toggleRow(transaction.transaction_id)}
+          checked={selectedRows.includes(transaction.id)}
+          onChange={() => toggleRow(transaction.id)}
         />
       </Table.Td>
-      <Table.Td>{formatDate(transaction.date)}</Table.Td>
-      <Table.Td>{transaction.name}</Table.Td>
-      <Table.Td>${Math.abs(transaction.amount).toFixed(2)}</Table.Td>
+      <Table.Td>{formatDate(transaction.transaction_date)}</Table.Td>
+      <Table.Td>{transaction.description}</Table.Td>
+      <Table.Td>{formatCurrency(transaction.amount)}</Table.Td>
       <Table.Td>
         <Group gap="xs">
           {transaction.category.map((cat, index) => (
@@ -67,6 +63,7 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
           {transaction.pending ? "Pending" : "Posted"}
         </Badge>
       </Table.Td>
+      <Table.Td>{transaction.account_name}</Table.Td>
     </Table.Tr>
   ));
 
@@ -88,6 +85,7 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
             <Table.Th>Amount</Table.Th>
             <Table.Th>Category</Table.Th>
             <Table.Th>Status</Table.Th>
+            <Table.Th>Account</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
