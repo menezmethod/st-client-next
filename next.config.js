@@ -10,10 +10,10 @@ const nextConfig = {
     NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
     PLAID_CLIENT_ID: process.env.PLAID_CLIENT_ID,
-    PLAID_SECRET: process.env.PLAID_SECRET,
+    PLAID_SECRET_SANDBOX: process.env.PLAID_SECRET_SANDBOX,
     PLAID_ENV: process.env.PLAID_ENV,
+    ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
   },
-  // Remove the rewrites function as it's not needed
 }
 
 module.exports = nextConfig

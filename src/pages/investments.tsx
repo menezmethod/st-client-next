@@ -1,53 +1,84 @@
-import React, { useEffect } from 'react';
-import { DashboardLayout } from '../components/Layout/DashboardLayout';
-import { Stack, Group, Button, Text, Loader, Alert, Skeleton } from '@mantine/core';
-import { InvestmentsTable } from '../features/investments/components/InvestmentsTable';
-import { usePlaidLink } from '../hooks/usePlaidLink';
-import { fetchInvestments } from '../lib/plaid';
+import React, { useCallback, useMemo } from 'react';
+import { DashboardLayout } from '@/components/Layout/DashboardLayout';
+import { Stack, Group, Button, Text, Alert, Skeleton } from '@mantine/core';
 import { IconAlertCircle, IconInfoCircle } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import { useErrorMessage } from '../hooks/useErrorMessage';
-import { Investment, Security, Account } from '../types/investment';
+import { useErrorMessage } from '@/hooks/useErrorMessage';
+import { Investment, Security } from '@/types/investment';
+import { Account } from '@/types/account'; // Assuming you have an Account type defined
+import { usePlaid } from '@/contexts/PlaidContext';
+import { useAuth } from '@/contexts/AuthContext';
+import axios from 'axios';
+import { InvestmentsTable } from '@/features/investments/components/InvestmentsTable';
 
-interface InvestmentsData {
-  holdings: Investment[];
-  securities: Security[];
-  accounts: Account[];
-}
+const InvestmentsPage: React.FC = React.memo(() => {
+  const { initiatePlaidLink, isLoading: isPlaidLoading } = usePlaid();
+  const { user } = useAuth();
 
-export default function InvestmentsPage() {
-  const { initiatePlaidLink, isLoading: isLinkLoading } = usePlaidLink();
-
-  const { 
-    data: accessToken,
-    isLoading: isAccessTokenLoading,
-  } = useQuery<string | null>({
-    queryKey: ['accessToken'],
-  });
-
-  const { 
-    data: investmentsData, 
-    isLoading: isInvestmentsLoading, 
+  const {
+    data: investmentsData,
+    isLoading: isInvestmentsLoading,
     error: investmentsError,
     refetch: refetchInvestments
-  } = useQuery<InvestmentsData>({
-    queryKey: ['investments', accessToken],
-    queryFn: () => fetchInvestments(accessToken!),
-    enabled: !!accessToken,
+  } = useQuery<{ investments: Investment[], securities: Security[] }>({
+    queryKey: ['investments'],
+    queryFn: async () => {
+      const token = await user?.getIdToken();
+      const response = await axios.get<{ investments: Investment[], securities: Security[] }>('/api/investments', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    },
+    enabled: !!user,
   });
 
-  const isLoading = isLinkLoading || isAccessTokenLoading || isInvestmentsLoading;
-  const errorMessage = useErrorMessage(investmentsError);
+  const {
+    data: accountsData,
+    isLoading: isAccountsLoading,
+    error: accountsError
+  } = useQuery<Account[]>({
+    queryKey: ['accounts'],
+    queryFn: async () => {
+      const token = await user?.getIdToken();
+      const response = await axios.get<{ accounts: Account[] }>('/api/accounts', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data.accounts;
+    },
+    enabled: !!user,
+  });
 
-  useEffect(() => {
-    if (accessToken) {
-      refetchInvestments();
+  const isLoading = isPlaidLoading || isInvestmentsLoading || isAccountsLoading;
+  const errorMessage = useErrorMessage(investmentsError || accountsError);
+
+  const handleInitiatePlaidLink = useCallback(async () => {
+    await initiatePlaidLink();
+    refetchInvestments();
+  }, [initiatePlaidLink, refetchInvestments]);
+
+  const renderContent = useMemo(() => {
+    if (isLoading) {
+      return <Skeleton height={200} />;
     }
-  }, [accessToken, refetchInvestments]);
-
-  const handleConnectAccount = () => {
-    initiatePlaidLink();
-  };
+    if (investmentsData && investmentsData.investments.length > 0 && accountsData) {
+      return (
+        <InvestmentsTable 
+          holdings={investmentsData.investments}
+          securities={investmentsData.securities}
+          accounts={accountsData}
+        />
+      );
+    }
+    return (
+      <Alert variant="light" color="blue" title="No Investments Found" icon={<IconInfoCircle />}>
+        No investments found. This could be due to no investments in the linked account or an error in fetching.
+      </Alert>
+    );
+  }, [isLoading, investmentsData, accountsData]);
 
   return (
     <DashboardLayout>
@@ -61,34 +92,22 @@ export default function InvestmentsPage() {
           )}
         </Group>
         
-        {isLoading ? (
-          <Skeleton height={200} />
-        ) : accessToken ? (
-          investmentsData ? (
-            <InvestmentsTable 
-              holdings={investmentsData.holdings || []}
-              securities={investmentsData.securities || []}
-              accounts={investmentsData.accounts || []}
-            />
-          ) : (
-            <Text>No investment data available.</Text>
-          )
-        ) : (
-          <Alert variant="light" color="red" title="No Investment Account Connected" icon={<IconInfoCircle />}>
-            Connect an investment account to view your investments.
-          </Alert>
-        )}
-
+        {renderContent}
+        
         <Group justify="flex-end">
           <Button 
-            onClick={handleConnectAccount}
+            onClick={handleInitiatePlaidLink}
             disabled={isLoading}
             loading={isLoading}
           >
-            {accessToken ? 'Reconnect investment account' : 'Connect an investment account'}
+            {investmentsData && investmentsData.investments.length > 0 ? 'Reconnect investment account' : 'Connect an investment account'}
           </Button>
         </Group>
       </Stack>
     </DashboardLayout>
   );
-}
+});
+
+InvestmentsPage.displayName = 'InvestmentsPage';
+
+export default InvestmentsPage;
