@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { query, pool } from '@/lib/db';
 import { verifyIdToken } from '@/lib/firebaseAdmin';
 import syncDataHandler from './plaid/sync_data';
-import syncUserHandler from './auth/sync_user';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log(`[${new Date().toISOString()}] [handler] Function called`);
@@ -14,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.warn('[handler] Missing or invalid Authorization header');
     return;
   }
-  const idToken = authHeader.split(' ')[1];
+  const idToken = authHeader.split('Bearer ')[1];
 
   let firebaseUid: string;
   try {
@@ -27,38 +26,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
 
-  // Fetch or sync user in the database
+  // Fetch user ID from the database
   let userId: string;
   const client = await pool.connect();
   try {
     const userResult = await query('SELECT id FROM users WHERE firebase_uid = $1', [firebaseUid]);
     if (userResult.rows.length === 0) {
-      console.warn(`[handler] User not found for UID: ${firebaseUid}. Attempting to sync user.`);
-      const { email, display_name } = req.body;
-
-      // Use the sync_user handler
-      const syncReq = {
-        ...req,
-        body: { idToken, id: firebaseUid, email, display_name }
-      } as NextApiRequest;
-      const syncRes = {
-        status: (code: number) => ({
-          json: (data: any) => {
-            if (code !== 200) throw new Error(data.error || 'Failed to sync user');
-          }
-        })
-      } as unknown as NextApiResponse;
-
-      await syncUserHandler(syncReq, syncRes);
-
-      const newUserResult = await query('SELECT id FROM users WHERE firebase_uid = $1', [firebaseUid]);
-      if (newUserResult.rows.length === 0) {
-        throw new Error('Failed to sync user');
-      }
-      userId = newUserResult.rows[0].id;
-    } else {
-      userId = userResult.rows[0].id;
+      console.error(`[handler] User not found for UID: ${firebaseUid}`);
+      res.status(404).json({ error: 'User not found' });
+      return;
     }
+    userId = userResult.rows[0].id;
   } catch (error: any) {
     console.error('[handler] Database error:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -70,17 +48,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'GET') {
     try {
-      const accountsResult = await query(`
-        SELECT id, account_source_id, name, type, subtype, balance, currency_code, is_active
-        FROM accounts 
-        WHERE user_id = $1
+      const transactionsResult = await query(`
+        SELECT t.*, a.name as account_name
+        FROM transactions t
+        JOIN accounts a ON t.account_id = a.id
+        WHERE t.user_id = $1
+        ORDER BY t.created_at DESC
+        LIMIT 100
       `, [userId]);
-      let accounts = accountsResult.rows;
+      let transactions = transactionsResult.rows;
 
-      console.log('Raw accounts data:', JSON.stringify(accounts, null, 2));
+      console.log('Raw transactions data:', JSON.stringify(transactions, null, 2));
 
-      if (accounts.length === 0) {
-        console.warn(`[handler] No accounts found in database for userId: ${userId}. Attempting to sync data.`);
+      if (transactions.length === 0) {
+        console.warn(`[handler] No transactions found in database for userId: ${userId}. Attempting to sync data.`);
         
         // Trigger a full data sync
         const syncDataReq = {
@@ -104,19 +85,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         
         await syncDataHandler(syncDataReq, syncDataRes);
 
-        // Fetch accounts again after sync
-        const newAccountsResult = await query('SELECT * FROM accounts WHERE user_id = $1', [userId]);
-        accounts = newAccountsResult.rows;
+        // Fetch transactions again after sync
+        const newTransactionsResult = await query(`
+          SELECT t.*, a.name as account_name
+          FROM transactions t
+          JOIN accounts a ON t.account_id = a.id
+          WHERE t.user_id = $1
+          ORDER BY t.created_at DESC
+          LIMIT 100
+        `, [userId]);
+        transactions = newTransactionsResult.rows;
       }
 
-      if (accounts.length === 0) {
-        return res.status(404).json({ error: 'No accounts found. Please connect your Plaid account and try again.' });
+      if (transactions.length === 0) {
+        return res.status(404).json({ error: 'No transactions found. Please connect your account and try again.' });
       }
 
-      console.log('Sending accounts to client:', JSON.stringify(accounts, null, 2));
-      res.status(200).json({ accounts });
+      console.log('Sending transactions to client:', JSON.stringify(transactions, null, 2));
+      res.status(200).json({ transactions });
     } catch (error: any) {
-      console.error(`[handler] Error fetching accounts:`, error.message, error.stack);
+      console.error(`[handler] Error fetching transactions:`, error.message, error.stack);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   } else {

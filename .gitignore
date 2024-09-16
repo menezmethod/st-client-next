@@ -36,3 +36,8 @@ yarn-error.log*
 next-env.d.ts
 
 tree.txt
+/.idea/modules.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/st-client-next.iml
+/.idea/vcs.xml
+/.idea/workspace.xml

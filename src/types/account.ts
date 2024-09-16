@@ -1,15 +1,10 @@
 export interface Account {
-  account_id: string;
-  balances: {
-    available: number | null;
-    current: number;
-    limit: number | null;
-    iso_currency_code: string;
-    unofficial_currency_code: string | null;
-  };
-  mask: string | null;
+  id: number;
+  account_source_id: string;
   name: string;
-  official_name: string | null;
-  subtype: string;
   type: string;
+  subtype: string;
+  balance: number;
+  currency_code: string;
+  is_active: boolean;
 }

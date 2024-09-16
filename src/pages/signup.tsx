@@ -1,36 +1,64 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { TextInput, PasswordInput, Button, Box, Title, Text, Divider, Paper, Container, Center } from '@mantine/core';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth } from '../lib/firebase';
-import { GoogleButton } from '../components/GoogleButton';
-import React from 'react';
+import { TextInput, PasswordInput, Button, Title, Text, Divider, Paper, Container, Center } from '@mantine/core';
+import { GoogleButton } from '@/components/GoogleButton';
+import { useUser, registerFn, googleSignInFn } from '@/lib/auth';  // Import registerFn
+
+console.log(`[${new Date().toISOString()}] [AppStart] SignupPage component initialized`);
+console.log(`[${new Date().toISOString()}] [AppStart] Environment:`, process.env.NODE_ENV);
 
 export default function SignupPage() {
+  console.log(`[${new Date().toISOString()}] [SignupPage] Function called`);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const { user, isLoading } = useUser();
+
+  console.log(`[${new Date().toISOString()}] [SignupPage] Initial state:`, { email, password, error, isLoading });
+
+  useEffect(() => {
+    console.log(`[${new Date().toISOString()}] [SignupPage] useEffect called with dependencies:`, { user, isLoading });
+    if (user && !isLoading) {
+      console.log(`[${new Date().toISOString()}] [SignupPage] User authenticated, redirecting to dashboard`);
+      router.push('/dashboard');
+    }
+  }, [user, isLoading, router]);
 
   const handleEmailSignup = async (e: React.FormEvent) => {
+    console.log(`[${new Date().toISOString()}] [handleEmailSignup] Function called with event:`, e);
+    console.time('EmailSignup');
     e.preventDefault();
+    setError('');
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      console.log(`[${new Date().toISOString()}] [handleEmailSignup] Attempting to create user with email:`, email);
+      await registerFn({ email, password });  // Use registerFn directly
+      console.log(`[${new Date().toISOString()}] [handleEmailSignup] User created successfully`);
       router.push('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
+      console.error(`[${new Date().toISOString()}] [handleEmailSignup] Error creating account:`, error.message, error.stack);
       setError('Failed to create an account. Please try again.');
     }
+    console.timeEnd('EmailSignup');
   };
 
   const handleGoogleSignup = async () => {
-    const provider = new GoogleAuthProvider();
+    console.log(`[${new Date().toISOString()}] [handleGoogleSignup] Function called`);
+    console.time('GoogleSignup');
     try {
-      await signInWithPopup(auth, provider);
+      console.log(`[${new Date().toISOString()}] [handleGoogleSignup] Attempting Google sign-up`);
+      await googleSignInFn();
+      console.log(`[${new Date().toISOString()}] [handleGoogleSignup] Google sign-up successful`);
       router.push('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
+      console.error(`[${new Date().toISOString()}] [handleGoogleSignup] Error during Google sign-up:`, error.message, error.stack);
       setError('Failed to sign up with Google.');
     }
+    console.timeEnd('GoogleSignup');
   };
+
+  console.log(`[${new Date().toISOString()}] [SignupPage] Rendering component`);
 
   return (
     <Center style={{ width: '100vw', height: '100vh' }}>
@@ -57,14 +85,20 @@ export default function SignupPage() {
               label="Email"
               placeholder="hello@example.com"
               value={email}
-              onChange={(event) => setEmail(event.currentTarget.value)}
+              onChange={(event) => {
+                console.log(`[${new Date().toISOString()}] [EmailInput] Email changed:`, event.currentTarget.value);
+                setEmail(event.currentTarget.value);
+              }}
               required
             />
             <PasswordInput
               label="Password"
               placeholder="Your password"
               value={password}
-              onChange={(event) => setPassword(event.currentTarget.value)}
+              onChange={(event) => {
+                console.log(`[${new Date().toISOString()}] [PasswordInput] Password changed`);
+                setPassword(event.currentTarget.value);
+              }}
               required
               mt="md"
             />
@@ -73,9 +107,11 @@ export default function SignupPage() {
             </Button>
           </form>
 
-          {error && <Text color="red" size="sm" mt="sm">{error}</Text>}
+          {error && <Text c="red" size="sm" mt="sm">{error}</Text>}
         </Paper>
       </Container>
     </Center>
   );
 }
+
+console.log(`[${new Date().toISOString()}] [AppExport] SignupPage component exported`);
