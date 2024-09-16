@@ -1,31 +1,21 @@
 export interface Transaction {
-  transaction_id: string;
-  account_id: string;
+  id: number;
+  user_id: string;
+  account_id: number;
+  transaction_source_id: string;
+  transaction_source: string;
   amount: number;
-  iso_currency_code: string;
-  unofficial_currency_code: string | null;
-  category: string[] | null;
-  category_id: string | null;
-  check_number: string | null;
-  date: string;
-  datetime: string | null;
+  transaction_date: string;
   authorized_date: string | null;
-  authorized_datetime: string | null;
-  location: {
-    address: string | null;
-    city: string | null;
-    region: string | null;
-    postal_code: string | null;
-    country: string | null;
-    lat: number | null;
-    lon: number | null;
-  };
-  name: string;
-  merchant_name: string | null;
-  payment_channel: string;
-  pending: boolean;
-  pending_transaction_id: string | null;
-  account_owner: string | null;
-  transaction_code: string | null;
+  description: string;
+  category: string[];
   transaction_type: string | null;
+  pending: boolean;
+  is_manual: boolean;
+  metadata: Record<string, any>;
+  is_duplicate: boolean;
+  created_at: string;
+  updated_at: string;
+  last_modified: string;
+  account_name: string;
 }

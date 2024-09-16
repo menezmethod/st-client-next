@@ -1,58 +1,37 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AppProps } from 'next/app';
-import { Loader, MantineProvider, Center } from '@mantine/core';
+import { MantineProvider } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { auth } from '../lib/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
 import '@mantine/core/styles.css'; 
-import { theme } from '../theme'; 
+import { theme } from '@/theme';
+import { PlaidProvider } from '@/contexts/PlaidContext';
+import { AuthProvider } from '@/contexts/AuthContext';
+
+console.log('[App Initialization] App started in environment:', process.env.NODE_ENV);
+console.log('[App Initialization] Theme configuration:', Object.keys(theme));
 
 const queryClient = new QueryClient();
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const router = useRouter();
-  const [isAuthReady, setIsAuthReady] = useState(false);
+  console.log('[MyApp] Function called with pageProps:', Object.keys(pageProps));
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('Auth state changed. User:', user ? 'Logged in' : 'Not logged in');
-      setIsAuthReady(true);
-      
-      if (user) {
-        if (router.pathname === '/login' || router.pathname === '/signup') {
-          router.push('/dashboard');
-        }
-      } else {
-        if (router.pathname !== '/login' && router.pathname !== '/signup') {
-          router.push('/login');
-        }
-      }
-    });
-
-    return () => unsubscribe();
-  }, [router]);
-
-  if (!isAuthReady) {
-    return (
-      <MantineProvider theme={theme}>
-        <Center style={{ width: '100vw', height: '100vh' }}>
-          <Loader color="blue" size="xl" type="bars" />
-        </Center>
-      </MantineProvider>
-    );
-  }
-
-  return (
+  const appContent = useMemo(() => (
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
-        <Component {...pageProps} />
+        <PlaidProvider>
+          <AuthProvider>
+            <Component {...pageProps} />
+          </AuthProvider>
+        </PlaidProvider>
       </MantineProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {process.env.NODE_ENV !== 'production' && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
-  );
+  ), [Component, pageProps]);
+
+  console.log('[MyApp] App structure rendered');
+
+  return appContent;
 }
 
 export default MyApp;

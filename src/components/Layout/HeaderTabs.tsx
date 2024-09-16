@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import {
   Container,
   Avatar,
@@ -8,7 +9,6 @@ import {
   Text,
   Menu,
   Tabs,
-  Burger,
   rem,
   useMantineTheme,
 } from '@mantine/core';
@@ -56,32 +56,30 @@ const tabs = [
 
 export function HeaderTabs() {
   const theme = useMantineTheme();
-  const [opened, setOpened] = useState(false);
-  const [userMenuOpened, setUserMenuOpened] = useState(false);
   const router = useRouter();
   const { data: user, isLoading } = useUser();
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await auth.signOut();
       router.push('/login');
     } catch (error) {
       console.error('Error logging out:', error);
     }
-  };
+  }, [router]);
 
-  const currentTab = tabs.find(tab => tab.href === router.pathname)?.value || 'dashboard';
+  const currentTab = useMemo(() => tabs.find(tab => tab.href === router.pathname)?.value || 'dashboard', [router.pathname]);
 
-  const items = tabs.map((tab) => (
-    <Tabs.Tab
-      key={tab.value}
-      value={tab.value}
-      onClick={() => router.push(tab.href)}
-      className={classes.tab}
-    >
-      {tab.label}
-    </Tabs.Tab>
-  ));
+  const items = useMemo(() => tabs.map((tab) => (
+    <Link key={tab.value} href={tab.href} passHref legacyBehavior>
+      <Tabs.Tab
+        value={tab.value}
+        className={classes.tab}
+      >
+        {tab.label}
+      </Tabs.Tab>
+    </Link>
+  )), []);
 
   return (
     <div className={classes.header}>
@@ -89,15 +87,11 @@ export function HeaderTabs() {
         <Group justify="space-between">
           <Logo />
 
-          <Burger opened={opened} onClick={() => setOpened((o) => !o)} hiddenFrom="sm" size="sm" />
-
           {!isLoading && user && (
             <Menu
               width={260}
               position="bottom-end"
               transitionProps={{ transition: 'pop-top-right' }}
-              onClose={() => setUserMenuOpened(false)}
-              onOpen={() => setUserMenuOpened(true)}
               withinPortal
             >
               <Menu.Target>
@@ -181,7 +175,6 @@ export function HeaderTabs() {
       <Container size="md">
         <Tabs
           value={currentTab}
-          onChange={(value) => router.push(tabs.find(tab => tab.value === value)?.href || '/')}
           variant="outline"
           classNames={{
             root: classes.tabs,

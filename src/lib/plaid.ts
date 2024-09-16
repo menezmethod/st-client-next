@@ -1,7 +1,7 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
 import axios from 'axios';
-import { Investment, Security, Account } from '../types/investment';
-import { Transaction } from '../types/transaction';
+import { Investment, Security, Account } from '@/types/investment';
+import { Transaction } from '@/types/transaction';
 
 interface InvestmentsData {
   holdings: Investment[];
@@ -14,7 +14,7 @@ const configuration = new Configuration({
   baseOptions: {
     headers: {
       'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID!,
-      'PLAID-SECRET': process.env.PLAID_SECRET!,
+      'PLAID-SECRET': process.env.PLAID_SECRET_SANDBOX!,
     },
   },
 });
@@ -30,9 +30,18 @@ export async function createLinkToken(): Promise<string> {
   return response.data.link_token;
 }
 
-export async function exchangePublicToken(public_token: string): Promise<string> {
-  const response = await apiClient.post<{ access_token: string }>('/exchange_public_token', { public_token });
-  return response.data.access_token;
+export async function exchangePublicToken(data: { public_token: string; idToken: string }): Promise<string> {
+  const response = await fetch('/api/plaid/exchange_public_token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to exchange public token');
+  }
+  return response.json();
 }
 
 export async function removeItem(access_token: string): Promise<any> {
@@ -46,7 +55,10 @@ async function fetchDataWithAccessToken<T>(endpoint: string, accessToken: string
 }
 
 export async function fetchAccounts(accessToken: string): Promise<Account[]> {
-  return fetchDataWithAccessToken<Account[]>('/fetch_accounts', accessToken);
+  console.log('Fetching accounts with access token:', accessToken);
+  const accounts = await fetchDataWithAccessToken<Account[]>('/fetch_accounts', accessToken);
+  console.log('Fetched accounts:', accounts);
+  return accounts;
 }
 
 export async function fetchTransactions(accessToken: string): Promise<Transaction[]> {
